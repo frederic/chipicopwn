@@ -25,7 +25,7 @@
 
 #include "bsp/board.h"
 #include "tusb.h"
-#include "../payloads/poc_step1.h"
+#include "../payloads/poc_step2.h"
 
 #if CFG_TUD_MSC
 #define CFG_EXAMPLE_MSC_READONLY
@@ -33,8 +33,8 @@
 // whether host does safe-eject
 static bool ejected = false;
 
-#define DISK_BLOCK_SIZE poc_step1_bin_len
-#define DISK_BLOCK_NUM (poc_step1_bin_len / DISK_BLOCK_SIZE) // 8KB is the smallest size that windows allow to mount
+#define DISK_BLOCK_SIZE poc_step2_bin_len
+#define DISK_BLOCK_NUM (poc_step2_bin_len / DISK_BLOCK_SIZE) // 8KB is the smallest size that windows allow to mount
 
 // Invoked when received SCSI_CMD_INQUIRY
 // Application fill vendor id, product id and revision with string up to 8, 16, 4 characters respectively
@@ -108,8 +108,8 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void* buff
   // out of ramdisk
   if ( lba >= DISK_BLOCK_NUM ) return -1;
 
-  uint8_t const* addr = &poc_step1_bin[lba * DISK_BLOCK_SIZE] + offset;
-  memcpy(buffer, addr, MIN(bufsize, poc_step1_bin_len));
+  uint8_t const* addr = &poc_step2_bin[lba * DISK_BLOCK_SIZE] + offset;
+  memcpy(buffer, addr, MIN(bufsize, poc_step2_bin_len));
 
   return (int32_t) bufsize;
 }
