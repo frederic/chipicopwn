@@ -226,7 +226,7 @@ char const* string_desc_arr [] =
 {
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
   "TinyUSB",                     // 1: Manufacturer
-  "TinyUSB Device",              // 2: Product
+  "CHIPICOPWN",                  // 2: Product
   "123456789012",                // 3: Serials, should use chip ID
   "TinyUSB CDC",                 // 4: CDC Interface
   "TinyUSB MSC",                 // 5: MSC Interface
@@ -256,7 +256,7 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
     const char* str = string_desc_arr[index];
 
     // Cap at max char
-    chr_count = strlen(str);
+    chr_count = (uint8_t) strlen(str);
     if ( chr_count > 31 ) chr_count = 31;
 
     // Convert ASCII string into UTF-16
