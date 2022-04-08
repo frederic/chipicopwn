@@ -43,7 +43,7 @@ issue at github.com/hathach/tinyusb"
 enum
 {
   DISK_BLOCK_NUM  = 16, // 8KB is the smallest size that windows allow to mount
-  DISK_BLOCK_SIZE = 512
+  DISK_BLOCK_SIZE = 1024
 };
 
 #ifdef CFG_EXAMPLE_MSC_READONLY
