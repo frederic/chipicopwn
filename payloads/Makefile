@@ -2,6 +2,7 @@ CROSS_COMPILER ?= ~/tools/cross/gcc-linaro-5.3.1-2016.05-x86_64_aarch64-linux-gn
 CC      = $(CROSS_COMPILER)gcc
 OBJCOPY = $(CROSS_COMPILER)objcopy
 XXD = xxd
+DD = dd
 AFLAGS  = -nostdlib
 CFLAGS  = -O3 -nostdlib
 LDFLAGS = -Wl,--build-id=none
@@ -14,17 +15,17 @@ BINS := $(patsubst %,%$(PRG_SUFFIX),$(PRGS))
 
 all: $(BINS)
 
-%.elf: %.S
-	$(CC) $(AFLAGS) $(LDFLAGS) -o $@ $^
+%.bin: %.S
+	$(CC) $(AFLAGS) $(LDFLAGS) -o $@ $<
+	$(OBJCOPY) -O binary -j .text $@
 
-%.elf: %.c
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
-
-%.bin: %.elf
-	$(OBJCOPY) -O binary -j .text $< $@
+%.bin: %.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
+	$(OBJCOPY) -O binary -j .text $@
+	$(DD) if=./RA.bin of=$@ bs=1 seek=568 conv=notrunc
 
 %.h: %.bin
-	$(XXD) -i $^ $@
+	$(XXD) -i $< $@
 
 .PHONY: clean
 clean:
