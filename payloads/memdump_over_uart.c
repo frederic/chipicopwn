@@ -93,8 +93,8 @@ static inline void watchdog_reset(void)
 void _start()
 {
 	void (*_reset)() = (void *)0xFFFF0000;
-	unsigned long mem_addr = 0x7bee1dc8;
-	unsigned int size = 0x100;
+	unsigned long mem_addr = 0x7FEF2000; // gd->relocaddr
+	unsigned int size = 0x10E000; // (gd->ram_top - gd->relocaddr)
 	while (size--)
 	{
 		uart_put_hex(*(unsigned char *)(mem_addr++), 8);
