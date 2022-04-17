@@ -6,6 +6,7 @@ DD = dd
 AFLAGS  = -nostdlib
 CFLAGS  = -O3 -nostdlib
 LDFLAGS = -Wl,--build-id=none
+TEMPLATE_BIN = template.bin
 
 SRCS := $(wildcard *.S)
 SRCC := $(wildcard *.c)
@@ -15,14 +16,16 @@ BINS := $(patsubst %,%$(PRG_SUFFIX),$(PRGS))
 
 all: $(BINS)
 
-%.bin: %.S
+%.elf: %.S
 	$(CC) $(AFLAGS) $(LDFLAGS) -o $@ $<
-	$(OBJCOPY) -O binary -j .text $@
 
-%.bin: %.c
+%.elf: %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
-	$(OBJCOPY) -O binary -j .text $@
-	$(DD) if=./RA.bin of=$@ bs=1 seek=568 conv=notrunc
+
+%.bin: %.elf
+	$(OBJCOPY) -O binary -j .text $<
+	cp $(TEMPLATE_BIN) $@
+	$(DD) if=$< of=$@ conv=notrunc
 
 %.h: %.bin
 	$(XXD) -i $< $@
