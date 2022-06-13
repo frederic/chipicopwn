@@ -13,8 +13,8 @@ _start:
     ldr x3, _run_command_list // load binary into download buffer
     br x3
 
-_bug_ptr: .dword 0x7ff26060
+_bug_ptr: .dword 0x7ff26178
 _bug_fix: .dword 0xd65f03c0d2800000
 _download_buf: .dword 0x01000000
-_run_command_list: .dword 0x7ff24720
-_command_list: .asciz "echo CHIPICOPWN!;osd setcolor 0x00000000;usb reset;fatload usb 0 0x8000000 CHIPICOPWN.BMP;bmp display 0x8000000;while true;do usb reset;if fatload usb 0 0x01000000 u-boot-elaine.bin;then echo yolo;exit;fi;done;"
+_run_command_list: .dword 0x7ff24838
+_command_list: .asciz "osd setcolor 0x00000000;usb reset;fatload usb 0 0x8000000 CHIPICOPWN.BMP;bmp display 0x8000000;while true;do usb reset;if fatload usb 0 0x01000000 u-boot-elaine.bin;then exit;fi;done;"
