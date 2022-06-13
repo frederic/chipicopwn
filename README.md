@@ -4,10 +4,14 @@
 Bootloader exploit for Google Nest Hub (2nd gen)
 
 ## requirements
-- Google Nest Hub (2nd Gen) - bootloader version *U-Boot 2019.01-gbfc19012ea-dirty (Dec 11 2020 - 04:19:32 )*
+- Google Nest Hub (2nd Gen)
 - Raspberry Pi Pico
 - Powered USB hub
 - [pico-sdk](https://github.com/raspberrypi/pico-sdk) (see [Getting Started guide](https://rptl.io/pico-get-started) for installation instructions)
+
+## supported version
+- [factory firmware (2020/12) - U-Boot 2019.01-gbfc19012ea-dirty (Dec 11 2020 - 04:19:32 )](https://github.com/frederic/chipicopwn/tree/main)
+- [factory firmware (2022/01, 2022/02) - U-Boot 2019.01-g9542d3593d-dirty (May 21 2021 - 20:52:42 )](https://github.com/frederic/chipicopwn/tree/fw-2022_01)
 
 ## build
 ```shell
